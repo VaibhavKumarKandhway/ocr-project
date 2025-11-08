@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CuraSense Diagnosis - Prescription Analysis</title>
+  <link rel="stylesheet" href="../src/styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="brand-container">
+          <h1 class="brand-main">CuraSense</h1>
+          <p class="brand-sub">Diagnosis</p>
+        </div>
+        <p>Prescription & Medicine Analysis Platform</p>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Navigation Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="upload">📸 Upload Image</button>
+        <button class="tab-btn" data-tab="manual">✏️ Enter Manually</button>
+        <button class="tab-btn" data-tab="compare">⚖️ Compare Medicines</button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tabs-content">
+        <!-- Upload Image Tab -->
+        <div id="upload" class="tab-content active">
+          <div class="card">
+            <h2>Upload Prescription Image</h2>
+            <p>Take a photo of your prescription or upload an image/PDF</p>
+            
+            <div class="upload-area" id="uploadArea">
+              <div class="upload-icon">📄</div>
+              <p>Drag & drop your prescription here or click to select</p>
+              <input type="file" id="fileInput" accept="image/*,.pdf" capture="environment" hidden>
+              <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Choose File</button>
+            </div>
+
+            <div id="preview" class="preview-container" style="display: none;">
+              <img id="previewImage" src="" alt="preview" class="preview-image">
+              <button class="btn btn-danger" onclick="clearPreview()">Clear</button>
+            </div>
+
+            <button class="btn btn-primary" id="uploadBtn" onclick="handleUpload()" style="display: none; margin-top: 20px;">
+              Extract Text & Analyze 🔍
+            </button>
+          </div>
+        </div>
+
+        <!-- Manual Entry Tab -->
+        <div id="manual" class="tab-content">
+          <div class="card">
+            <h2>Enter Medicines Manually</h2>
+            <p>Type in your medicines and details</p>
+            
+            <div id="medicinesForm">
+              <div class="medicine-input" id="medicineInput1">
+                <div class="form-group">
+                  <label>Medicine Name *</label>
+                  <input type="text" class="medicine-name" placeholder="e.g., Paracetamol" data-index="1">
+                </div>
+                <div class="form-group">
+                  <label>Dosage</label>
+                  <input type="text" class="medicine-dosage" placeholder="e.g., 500mg" data-index="1">
+                </div>
+                <div class="form-group">
+                  <label>Frequency</label>
+                  <select class="medicine-frequency" data-index="1">
+                    <option value="">Select frequency</option>
+                    <option value="Once daily">Once daily (OD)</option>
+                    <option value="Twice daily">Twice daily (BD)</option>
+                    <option value="Thrice daily">Thrice daily (TDS)</option>
+                    <option value="Four times daily">Four times daily (QID)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Duration</label>
+                  <input type="text" class="medicine-duration" placeholder="e.g., 5 days" data-index="1">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-secondary" onclick="addMedicineField()">+ Add Medicine</button>
+              <button class="btn btn-primary" onclick="handleManualSubmit()">Analyze & Check Safety ✓</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compare Medicines Tab -->
+        <div id="compare" class="tab-content">
+          <div class="card">
+            <h2>Compare Medicines</h2>
+            <p>Compare brands and check for interactions</p>
+            
+            <div class="form-group">
+              <label>Generic Medicine Name *</label>
+              <input type="text" id="compareGeneric" placeholder="e.g., Paracetamol" class="form-control">
+              <small id="suggestionsList" class="suggestions"></small>
+            </div>
+
+            <div class="comparison-row">
+              <div class="comparison-col">
+                <h3>Brand 1</h3>
+                <div class="form-group">
+                  <label>Brand Name *</label>
+                  <input type="text" id="brand1Name" placeholder="e.g., Calpol" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label>Dosage *</label>
+                  <input type="text" id="brand1Dosage" placeholder="e.g., 500mg" class="form-control">
+                </div>
+              </div>
+
+              <div class="comparison-col">
+                <h3>Brand 2</h3>
+                <div class="form-group">
+                  <label>Brand Name *</label>
+                  <input type="text" id="brand2Name" placeholder="e.g., Tylenol" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label>Dosage *</label>
+                  <input type="text" id="brand2Dosage" placeholder="e.g., 500mg" class="form-control">
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="handleComparison()">Compare & Analyze ⚖️</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div id="resultsSection" class="card results-card" style="display: none; margin-top: 30px;">
+        <div class="results-header">
+          <h2>Analysis Results</h2>
+          <button class="btn btn-toggle" id="toggleRawText" onclick="toggleRawTextView()" style="display: none;">
+            👁️ Show Raw Text
+          </button>
+        </div>
+        <div id="resultsContent"></div>
+        <div id="rawTextSection" class="raw-text-section" style="display: none; margin-top: 30px;">
+          <h3>📄 Raw Extracted Text (Testing Mode)</h3>
+          <div id="rawTextContent" class="raw-text-content"></div>
+          <button class="btn btn-secondary" onclick="copyRawText()">📋 Copy Raw Text</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+      <div class="spinner"></div>
+      <p>Processing...</p>
+    </div>
+  </div>
+
+  <script src="../src/app.js"></script>
+</body>
+</html>
