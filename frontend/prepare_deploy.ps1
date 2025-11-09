@@ -3,13 +3,19 @@ Prepare a deployable `dist/` folder for Netlify CLI deploy.
 
 Usage (PowerShell):
   cd d:\ocr-project\ocr-app\frontend
+  .\prepare_deploy.ps1 -BackendUrl "https://your-backend.onrender.com"
+  
+  Or use default backend URL:
   .\prepare_deploy.ps1
 
 This will create/replace the `dist/` directory containing a corrected index.html
 and copied `app.js` and `styles.css` so the site can be deployed as a static folder.
+It also injects the backend API URL into the HTML so the frontend knows where to call.
 #>
 
-param()
+param(
+    [string]$BackendUrl = "https://ocr-backend.onrender.com"
+)
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $publicDir = Join-Path $scriptDir 'public'
@@ -42,14 +48,21 @@ foreach ($f in @('app.js','styles.css')) {
 
 $indexPath = Join-Path $distDir 'index.html'
 if (Test-Path $indexPath) {
-    Write-Host "Rewriting paths in index.html to use local assets..."
+    Write-Host "Rewriting paths in index.html..."
     $content = Get-Content $indexPath -Raw
     # Replace ../src/app.js -> ./app.js and ../src/styles.css -> ./styles.css
     $content = $content -replace '\.\./src/app.js','./app.js'
     $content = $content -replace '\.\./src/styles.css','./styles.css'
+    
+    # Inject API_BASE URL into index.html before app.js script tag
+    $apiInjection = "<script>`n    window.__API_BASE__ = '$BackendUrl/api/v1';`n  </script>"
+    $content = $content -replace '(<script src="\.\/app\.js"><\/script>)', "$apiInjection`n  `$1"
+    
     Set-Content -Path $indexPath -Value $content -Force
+    Write-Host "✓ Injected API_BASE = $BackendUrl/api/v1"
 } else {
     Write-Host "Error: index.html not found in public/"
 }
 
 Write-Host "Done. Deploy-ready folder is: $distDir"
+Write-Host "Next: cd $distDir && npx netlify-cli deploy --prod --dir=dist"

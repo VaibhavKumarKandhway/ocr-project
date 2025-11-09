@@ -13,3 +13,6 @@ coverage/
 uploads/
 temp/
 notes/
+
+# Local Netlify folder
+.netlify

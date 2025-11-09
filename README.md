@@ -352,27 +352,4 @@ If you get CORS errors, ensure the backend is running on `http://localhost:3000`
 - [ ] Integration with medical records
 - [ ] Multi-language support
 
-## Contributing
 
-Feel free to extend this project with:
-- More medicines and brands to database
-- Better parsing algorithms
-- Integration with real medicine databases
-- Enhanced UI/UX
-- Mobile app wrapper
-
-## License
-
-MIT License
-
-## Support
-
-For issues or questions:
-1. Check the troubleshooting section
-2. Review error messages in browser console
-3. Check backend logs
-4. Verify all dependencies are installed
-
----
-
-**Made with ❤️ for safer medicine usage**

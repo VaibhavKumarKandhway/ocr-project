@@ -1,4 +1,6 @@
-const API_BASE = 'http://localhost:3000/api/v1';
+// API_BASE: Injected at build time (see prepare_deploy.ps1)
+// Fallback to production URL or localhost for local development
+const API_BASE = window.__API_BASE__ || 'https://ocr-backend.onrender.com/api/v1';
 let selectedFile = null;
 let medicineFieldCount = 1;
 let lastExtractedText = '';
